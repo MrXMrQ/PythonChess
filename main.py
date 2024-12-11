@@ -1,6 +1,9 @@
 #Tests for figures
 from Test import Test_Figures
 
+#Chessboard
+from MyChessboard import Chessboard
+
 #Chess pieces
 from MyFigure import Figure
 from MyPawn import Pawn
@@ -16,10 +19,11 @@ def fill_figures() -> list:
     return[pawns, rooks]
 
 def start_test():
-    print(figures)
-    testing_area: Test_Figures = Test_Figures(figures[0], figures[1])
+    print(pieces)
+    testing_area: Test_Figures = Test_Figures(pieces[0], pieces[1])
     testing_area.pawn_test()
+    testing_area.rook_test()
 
-figures: Figure = fill_figures()
-
-start_test()
+pieces: Figure = fill_figures()
+board = Chessboard(pieces)
+board.print_formated_chessboard()
