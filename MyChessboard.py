@@ -1,4 +1,5 @@
 from MyFigure import Figure
+from MyCustomButton import Custom_Button
 from tkinter import *
 
 def create_chessboard(pieces: Figure) -> dict:
@@ -23,8 +24,6 @@ def create_chessboard(pieces: Figure) -> dict:
             board.update({(8 - i, j + 1): None}) 
         
     return assign_chesspieces(board, pieces)
-
-
 
 def assign_chesspieces(board: dict, pieces: Figure) -> dict:
     """
@@ -113,8 +112,10 @@ class Chessboard:
                 text = "{}".format(self.board[i].name)
                 print(text)
 
-            button = Button(window, text=text, bg="lightgray" if (i[0] + i[1]) % 2 == 0 else "gray")
-            button.grid(row=8-i[0], column=i[1], sticky="nsew")
+            Custom_Button(window, text, "lightgray" if (i[0] + i[1]) % 2 == 0 else "gray", i, self.board)
+
+            #button = Button(window, text=text, bg="lightgray" if (i[0] + i[1]) % 2 == 0 else "gray")
+            #button.grid(row=8-i[0], column=i[1], sticky="nsew")
 
         return window
 
@@ -131,3 +132,6 @@ class Chessboard:
         """
         
         pass
+
+    def get_board_dict(self) -> dict:
+        return self.board
