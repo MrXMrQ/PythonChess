@@ -1,4 +1,5 @@
 from MyFigure import Figure
+from tkinter import *
 
 def create_chessboard(pieces: Figure) -> dict:
     """
@@ -19,9 +20,11 @@ def create_chessboard(pieces: Figure) -> dict:
 
     for i in range(8):
         for j in range(8):
-            board.update([((j + 1, i + 1), ((j + 1, i + 1), None))]) 
+            board.update({(8 - i, j + 1): None}) 
         
     return assign_chesspieces(board, pieces)
+
+
 
 def assign_chesspieces(board: dict, pieces: Figure) -> dict:
     """
@@ -42,7 +45,7 @@ def assign_chesspieces(board: dict, pieces: Figure) -> dict:
         for piece in pieces[piece_group]:
             start_field: tuple = piece.start_field
             if start_field in board:
-                board[start_field] = (start_field, piece)
+                board[start_field] = piece
 
     return board
 
@@ -83,8 +86,39 @@ class Chessboard:
             # Add a newline after every 8 elements (end of a row)
             if index % 8 == 0:
                 print()
+
+    def create_label(self, window, row, col, text="", bg_color="white", fg_color="black"):
+        label = Label(window, text=text, bg=bg_color, fg=fg_color)
+        label.grid(row=row, column=col, sticky="nsew")
     
-    def update_chessboard(self, old_value, new_value):
+    def create_window(self) -> Tk:
+        window = Tk()
+        window.title("Chessboard")
+        window.minsize(500,500)
+        for i in range(9):
+                window.grid_rowconfigure(i, weight=1)
+                window.grid_columnconfigure(i, weight=1)
+
+        for i in range(9):
+            for j in range(9):
+                if i == 8 and j < 8:  # Untere Leiste
+                    self.create_label(window, i, j + 1, text=f"{j + 1}")
+                elif j == 0 and i < 8:  # Linke Leiste
+                    self.create_label(window, i, j, text=f"{8 - i}")
+
+        for i in self.board:
+            text = "{} {} ".format(i[0], i[1])
+
+            if not self.board[i] == None:
+                text = "{}".format(self.board[i].name)
+                print(text)
+
+            button = Button(window, text=text, bg="lightgray" if (i[0] + i[1]) % 2 == 0 else "gray")
+            button.grid(row=8-i[0], column=i[1], sticky="nsew")
+
+        return window
+
+    def update_chessboard(self, window, old_value, new_value):
         """
         Updates the chessboard by moving a piece from one position to another.
 
