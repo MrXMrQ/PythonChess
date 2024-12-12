@@ -1,4 +1,5 @@
 from MyPawn import Pawn
+from MyRook import Rook
 
 class Test_Figures:
     """
@@ -42,7 +43,7 @@ class Test_Figures:
         """
 
         for i in range(len(self.pawns)):
-            assert self.pawns[i].start_field == (i + 1, 2), "Startfield {} for {} not correct!".format(self.pawns[i].start_field, self.pawns[i].name)
+            assert self.pawns[i].start_field == (2, i + 1), "Startfield {} for {} not correct!".format(self.pawns[i].start_field, self.pawns[i].name)
         
         print("Start fields correct!")
 
@@ -61,23 +62,23 @@ class Test_Figures:
         for i in range(len(self.pawns)):
             test_pawn: Pawn = self.pawns[i]
 
-            test_pawn.move((i + 1,4))
-            assert test_pawn.get_Field() == (i + 1,4), "Pawn {} can only move 2 squares at the beginning".format(test_pawn.name)
+            test_pawn.move((4,i + 1))
+            assert test_pawn.get_Field() == (4,i + 1), "Pawn {} can only move 2 squares at the beginning".format(test_pawn.name)
         
-            test_pawn.move((i + 1,5))
-            assert test_pawn.get_Field() == (i + 1,5), "Pawn {} cannot move 1 square in the game.".format(test_pawn.name)
+            test_pawn.move((5,i + 1))
+            assert test_pawn.get_Field() == (5,i + 1), "Pawn {} cannot move 1 square in the game.".format(test_pawn.name)
 
-            test_pawn.move((i + 1,7))
-            assert test_pawn.get_Field() == (i + 1,5), "Pawn {} moves 2 spaces in the game".format(test_pawn.name)
+            test_pawn.move((7,i + 1))
+            assert test_pawn.get_Field() == (5,i + 1), "Pawn {} moves 2 spaces mid game".format(test_pawn.name)
 
-            test_pawn.move((i + 1,6))
-            test_pawn.move((i + 1,7))
-            test_pawn.move((i + 1,8))
+            test_pawn.move((6,i + 1))
+            test_pawn.move((7,i + 1))
+            test_pawn.move((8,i + 1))
             
             assert test_pawn.is_at_end, "Pawn {} bool does not switch when reaching the end".format(test_pawn.name)
 
-            test_pawn.move((i + 1,9))
-            assert test_pawn.get_Field() == (i + 1,8), "Pawn {} can move off the board".format(test_pawn.name)
+            test_pawn.move((9,i + 1))
+            assert test_pawn.get_Field() == (8,i + 1), "Pawn {} can move off the board".format(test_pawn.name)
 
         print("Move test correct!")
     
@@ -88,4 +89,26 @@ class Test_Figures:
         Currently, this method only prints a success message.
         """
         
+        print("Attack tests correct!")
+
+    def rook_test(self) -> None:
+        print("---------------------------- \nRook:")
+        self.rook_start_field()
+        self.rook_movement()
+        self.rook_attack()
+        print("Passed all the rook tests! \n----------------------------")
+
+    def rook_start_field(self) -> None:
+        assert self.rooks[0].start_field == (1, 1), "Startfield {} for {} not correct!".format(self.rooks[0].start_field, self.rooks[0].name)
+        assert self.rooks[1].start_field == (1, 8), "Startfield {} for {} not correct!".format(self.rooks[1].start_field, self.rooks[1].name)
+
+        print("Start fields correct!")
+
+    def rook_movement(self) -> None:
+        for i in range(len(self.rooks)):
+            test_rook: Rook = self.rooks[i]
+
+        print("Move test correct!")
+
+    def rook_attack(self) -> None:
         print("Attack tests correct!")

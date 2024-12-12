@@ -1,6 +1,6 @@
 from MyFigure import Figure
 
-def check_statement(old_x: int, new_x: int, old_y: int, new_y: int) -> bool:
+def check_statement(old_left_value: int, new_left_value: int, old_right_value: int, new_right_value: int) -> bool:
         """
         Check if the movement of a pawn is valid.
 
@@ -16,7 +16,7 @@ def check_statement(old_x: int, new_x: int, old_y: int, new_y: int) -> bool:
         Returns:
             bool: True if the move satisfies the conditions, otherwise False.
         """
-        return old_x == new_x and new_y > old_y and new_y - old_y == 1
+        return old_left_value < new_left_value and new_right_value == old_right_value and new_left_value - old_left_value == 1
 
 class Pawn(Figure):
     """
@@ -46,7 +46,7 @@ class Pawn(Figure):
         self.first_move = first_move
         self.is_at_end = is_at_end
 
-    def move(self, potential_new_field: tuple):
+    def move(self, potential_new_field: tuple) -> bool:
         """
         Attempt to move the pawn to a new field.
 
@@ -60,22 +60,23 @@ class Pawn(Figure):
             None
         """
 
-        old_x, old_y, new_x, new_y = self.current_field[0], self.current_field[1], potential_new_field[0], potential_new_field[1], 
+        old_left_value, old_right_value, new_left_value, new_right_value = self.current_field[0], self.current_field[1], potential_new_field[0], potential_new_field[1], 
 
         # If the pawn is at the end, no more movement is accepted!
         if self.is_at_end:
-            return
+            return False
 
         # new_y - old_y == 2 and self.first_move: to check if the pawn can move two squares forward, but only on its first move.
-        if  check_statement(old_x, new_x, old_y, new_y) or (new_y - old_y == 2 and self.first_move):
+        if  check_statement(old_left_value, new_left_value, old_right_value, new_right_value) or (new_left_value - old_left_value == 2 and self.first_move):
             self.first_move = False
             self.current_field = potential_new_field
 
-            if self.current_field[1] == 8:
+            if self.current_field[0] == 8:
                 self.is_at_end = True
+
+            return True
             
-        else:
-            pass
+        return False
 
     def get_Field(self) -> tuple:
         """
@@ -83,6 +84,8 @@ class Pawn(Figure):
 
         Returns:
             tuple: The current field of the pawn as (x, y).
+                x: hight (left_value)
+                y: widht (right_value)
         """
         return self.current_field
     
