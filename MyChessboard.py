@@ -114,9 +114,6 @@ class Chessboard:
 
             Custom_Button(window, text, "lightgray" if (i[0] + i[1]) % 2 == 0 else "gray", i, self.board)
 
-            #button = Button(window, text=text, bg="lightgray" if (i[0] + i[1]) % 2 == 0 else "gray")
-            #button.grid(row=8-i[0], column=i[1], sticky="nsew")
-
         return window
 
     def update_chessboard(self, window, old_value, new_value):
