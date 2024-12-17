@@ -1,29 +1,33 @@
-#Tests for figures
-from Test import Test_Figures
+# Pieces
+from Pieces.MyPiece import Piece
+from Pieces.MyPawn import Pawn
+from Pieces.MyRook import Rook
+from Pieces.MyBishop import Bishop
+from Pieces.MyQueen import Queen
 
-#Chessboard
-from MyChessboard import Chessboard
-
-#Chess pieces
-from MyFigure import Figure
-from MyPawn import Pawn
-from MyRook import Rook
+# Chessboard
+from tkinter import *
+from GUI.Chessboard.MyChessboard import Chessboard
 
 def fill_figures() -> list:
     pawns: Pawn = []
     for i in range(8):
-        pawns.append(Pawn("Pawn {}".format(i + 1), (i + 1,2)))
+        pawns.append(Pawn("Pawn {}".format(i + 1), (2,i + 1)))
 
-    rooks: Rook = [Rook("Rook0", (1,1)), Rook("Rook1", (8,1))]
-        
-    return[pawns, rooks]
+    rooks: Rook = []
+    rooks.append(Rook("Rook 1", (1,1)))
+    rooks.append(Rook("Rook 2", (1,8)))
 
-def start_test():
-    print(pieces)
-    testing_area: Test_Figures = Test_Figures(pieces[0], pieces[1])
-    testing_area.pawn_test()
-    testing_area.rook_test()
+    bishop: Bishop = []
+    bishop.append(Bishop("Bishop 1", (1,3)))
+    bishop.append(Bishop("Bishop 1", (1,6)))
 
-pieces: Figure = fill_figures()
-board = Chessboard(pieces)
-board.print_formated_chessboard()
+
+
+    return[pawns, rooks, bishop, [Queen("Queen", (1,4))]]
+
+pieces: Piece = fill_figures()
+chessboard = Chessboard(pieces)
+
+window = chessboard.create_window()
+window.mainloop()
