@@ -30,31 +30,41 @@ class Pawn(Figure):
 
     def calculate_valid_moves(self, chessboard: dict) -> list:
         """
-        Calculate the list of valid moves for a pawn based on its current position.
-
-        The valid moves for a pawn are determined based on its current position and 
-        whether it is its first move or not. For a pawn, valid moves involve moving 
-        one square forward or two squares forward from its starting position. 
-        This method checks all possible squares for a valid move based on the row and 
-        column conditions and appends valid ones to the result list.
-
-        Args:
-            chessboard (dict): A dictionary representing the chessboard with keys as positions (tuples) and values as pieces on the board.
-
-        Returns:
-            list: A list of valid move positions for the pawn.
+        Calculates all valid trains for a pawn. 
+        - A pawn moves up (negative direction in lines). 
+        - The pawn can take two steps at the starting field. 
+        - The pawn can strike diagonally if there is an opposing figure there. 
+        
+        Args: 
+            chessboard (dict): The chessboard as a dictionary. 
+        Returns: 
+            list: A list of valid trains for the farmer.
         """
+        valid_moves = []
+        row, col = self.current_field
+    
+        one_step = (row + 1, col)
+        if one_step in chessboard and chessboard[one_step] is None:
+            valid_moves.append(one_step)
 
-        valid_moves: list = []
+            two_steps = (row + 2, col)
+            if self.first_move and two_steps in chessboard and chessboard[two_steps] is None:
+                valid_moves.append(two_steps)
 
-        for i in chessboard:
-            if i[1] == self.current_field[1] and (i[0] - self.current_field[0] == 1 or (i[0] - self.current_field[0] == 2 and self.first_move)):
-                valid_moves.append(i)
+        diagonal_left = (row + 1, col - 1)
+        diagonal_right = (row + 1, col + 1)
+
+        if diagonal_left in chessboard and chessboard[diagonal_left] is not None:
+            if not chessboard[diagonal_left].is_Friend:
+                valid_moves.append(diagonal_left)
+
+        if diagonal_right in chessboard and chessboard[diagonal_right] is not None:
+            if not chessboard[diagonal_right].is_Friend:
+                valid_moves.append(diagonal_right)
 
         return valid_moves
 
-
-    def execute_valid_move(self, field: tuple, chessboard: dict) -> None:
+    def execute_valid_move(self, field: tuple, chessboard: dict) -> dict:
         """
         Execute a valid move for the pawn on the chessboard.
 
