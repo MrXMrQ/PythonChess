@@ -86,35 +86,65 @@ class Chessboard:
             if index % 8 == 0:
                 print()
 
+    from tkinter import Tk, Label
+
     def create_label(self, window, row, col, text="", bg_color="white", fg_color="black"):
+        """
+        Creates and places a label in the given window at the specified grid position.
+
+        Args:
+            window (Tk): The parent Tkinter window.
+            row (int): The row in the grid where the label will be placed.
+            col (int): The column in the grid where the label will be placed.
+            text (str, optional): The text to display in the label. Defaults to an empty string.
+            bg_color (str, optional): Background color of the label. Defaults to "white".
+            fg_color (str, optional): Foreground color (text color) of the label. Defaults to "black".
+        """
         label = Label(window, text=text, bg=bg_color, fg=fg_color)
         label.grid(row=row, column=col, sticky="nsew")
-    
+
     def create_window(self) -> Tk:
+        """
+        Creates the chessboard window, configures the grid, and populates it with labels and buttons.
+
+        The window includes:
+            - A chessboard grid with row and column labels.
+            - A dynamic chessboard where pieces are represented as buttons.
+
+        Returns:
+            Tk: The created Tkinter window.
+        """
         window = Tk()
         window.title("Chessboard")
-        window.minsize(500,500)
-        for i in range(9):
-                window.grid_rowconfigure(i, weight=1)
-                window.grid_columnconfigure(i, weight=1)
+        window.minsize(500, 500)
 
+        # Configure the grid layout to make rows and columns expandable
+        for i in range(9):
+            window.grid_rowconfigure(i, weight=1)
+            window.grid_columnconfigure(i, weight=1)
+
+        # Add row and column labels (numbers) for the chessboard
         for i in range(9):
             for j in range(9):
-                if i == 8 and j < 8:  # Untere Leiste
+                if i == 8 and j < 8:  # Bottom row (numbers)
                     self.create_label(window, i, j + 1, text=f"{j + 1}")
-                elif j == 0 and i < 8:  # Linke Leiste
+                elif j == 0 and i < 8:  # Left column (numbers)
                     self.create_label(window, i, j, text=f"{8 - i}")
 
-        for i in self.board:
-            text = "{} {} ".format(i[0], i[1])
-
-            if not self.board[i] == None:
-                text = "{}".format(self.board[i].name)
-                print(text)
-
-            Custom_Button(window, text, "lightgray" if (i[0] + i[1]) % 2 == 0 else "gray", i, self.board)
+        # Add the chessboard pieces as buttons (Custom_Button is assumed to be defined elsewhere)
+        for position, piece in self.board.items():
+            row, col = position
+            text = f"{row} {col} "
+        
+            if piece is not None:
+                text = piece.name  # Use the piece's name for display
+        
+            # Set the color for the button based on the position
+            button_color = "lightgray" if (row + col) % 2 == 0 else "gray"
+            Custom_Button(window, text, button_color, position, self.board)
 
         return window
+
 
     def update_chessboard(self, window, old_value, new_value):
         """
