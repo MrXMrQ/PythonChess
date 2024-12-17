@@ -1,4 +1,4 @@
-class Figure:
+class Piece:
     """
     Represents a figure in a game or simulation, such as a chess piece or a game character.
 

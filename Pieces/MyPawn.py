@@ -1,6 +1,6 @@
-from Figures.MyFigure import Figure
+from Pieces.MyPiece import Piece
 
-class Pawn(Figure):
+class Pawn(Piece):
     """
     Represents a pawn in a chess game.
 

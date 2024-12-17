@@ -1,6 +1,6 @@
-from Figures.MyFigure import Figure
+from Pieces.MyPiece import Piece
 
-class Rook(Figure):
+class Rook(Piece):
     def __init__(self, name: str, start_field: tuple, is_Friend: bool = True):
         super().__init__(name, start_field, is_Friend)
 

@@ -1,8 +1,8 @@
-from Figures.MyFigure import Figure
+from Pieces.MyPiece import Piece
 from GUI.Chessboard.MyCustomButton import Custom_Button
 from tkinter import *
 
-def create_chessboard(pieces: Figure) -> dict:
+def create_chessboard(pieces: Piece) -> dict:
     """
     Creates an initial chessboard representation as a dictionary.
 
@@ -25,7 +25,7 @@ def create_chessboard(pieces: Figure) -> dict:
         
     return assign_chesspieces(board, pieces)
 
-def assign_chesspieces(board: dict, pieces: Figure) -> dict:
+def assign_chesspieces(board: dict, pieces: Piece) -> dict:
     """
     Assigns chess pieces to their starting positions on the board.
 
