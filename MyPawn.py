@@ -1,23 +1,5 @@
 from MyFigure import Figure
 
-def check_statement(old_left_value: int, new_left_value: int, old_right_value: int, new_right_value: int) -> bool:
-        """
-        Check if the movement of a pawn is valid.
-
-        A valid movement is one where the x-coordinate remains the same, the y-coordinate
-        increases by exactly 1, and the movement direction is forward.
-
-        Args:
-            old_x (int): The original x-coordinate of the pawn.
-            new_x (int): The new x-coordinate of the pawn.
-            old_y (int): The original y-coordinate of the pawn.
-            new_y (int): The new y-coordinate of the pawn.
-
-        Returns:
-            bool: True if the move satisfies the conditions, otherwise False.
-        """
-        return old_left_value < new_left_value and new_right_value == old_right_value and new_left_value - old_left_value == 1
-
 class Pawn(Figure):
     """
     Represents a pawn in a chess game.
@@ -46,37 +28,60 @@ class Pawn(Figure):
         self.first_move = first_move
         self.is_at_end = is_at_end
 
-    def move(self, potential_new_field: tuple) -> bool:
+    def calculate_valid_moves(self, chessboard: dict) -> list:
         """
-        Attempt to move the pawn to a new field.
+        Calculate the list of valid moves for a pawn based on its current position.
 
-        If the move is valid, update the pawn's position. The first move allows for an optional two-square movement.
-        If the pawn reaches the end of the board, mark it as such.
+        The valid moves for a pawn are determined based on its current position and 
+        whether it is its first move or not. For a pawn, valid moves involve moving 
+        one square forward or two squares forward from its starting position. 
+        This method checks all possible squares for a valid move based on the row and 
+        column conditions and appends valid ones to the result list.
 
         Args:
-            potential_new_field (tuple): The target field as (x, y) to which the pawn intends to move.
+            chessboard (dict): A dictionary representing the chessboard with keys as positions (tuples) and values as pieces on the board.
 
         Returns:
-            None
+            list: A list of valid move positions for the pawn.
         """
 
-        old_left_value, old_right_value, new_left_value, new_right_value = self.current_field[0], self.current_field[1], potential_new_field[0], potential_new_field[1], 
+        valid_moves: list = []
 
-        # If the pawn is at the end, no more movement is accepted!
-        if self.is_at_end:
-            return False
+        for i in chessboard:
+            if i[1] == self.current_field[1] and (i[0] - self.current_field[0] == 1 or (i[0] - self.current_field[0] == 2 and self.first_move)):
+                valid_moves.append(i)
 
-        # new_y - old_y == 2 and self.first_move: to check if the pawn can move two squares forward, but only on its first move.
-        if  check_statement(old_left_value, new_left_value, old_right_value, new_right_value) or (new_left_value - old_left_value == 2 and self.first_move):
+        return valid_moves
+
+
+    def execute_valid_move(self, field: tuple, chessboard: dict) -> None:
+        """
+        Execute a valid move for the pawn on the chessboard.
+
+        This method updates the chessboard by moving the pawn from its current position
+        to the target field. It also ensures that the pawn cannot move to an invalid 
+        location (not on the board), and it updates the `first_move` attribute of the pawn.
+
+        Args:
+            field (tuple): The target position (row, column) on the chessboard.
+            chessboard (dict): A dictionary representing the chessboard.
+
+        Raises:
+            IndexError: If the field is not a valid position on the chessboard.
+
+        Returns:
+            dict: The updated chessboard after the move.
+        """
+
+        if field in chessboard:
             self.first_move = False
-            self.current_field = potential_new_field
+            chessboard[self.current_field] = None
+            self.current_field = field
+            chessboard[field] = self
+        else:
+            raise IndexError("{} does not exist in dict chessboard in execute_valid_move for pawn".format(field))
 
-            if self.current_field[0] == 8:
-                self.is_at_end = True
-
-            return True
-            
-        return False
+        return chessboard
 
     def get_Field(self) -> tuple:
         """
@@ -88,12 +93,3 @@ class Pawn(Figure):
                 y: widht (right_value)
         """
         return self.current_field
-    
-    def kill_instance(self) -> None:
-        """
-        Handle the pawn being removed from the game.
-
-        Returns:
-            None
-        """
-        pass

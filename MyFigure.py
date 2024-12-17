@@ -24,4 +24,3 @@ class Figure:
         self.start_field = start_field
         self.current_field = start_field
         self.is_Friend = is_Friend
-        
