@@ -1,5 +1,5 @@
-from MyPawn import Pawn
-from MyRook import Rook
+from Figures.MyPawn import Pawn
+from Figures.MyRook import Rook
 
 class Test_Figures:
     """

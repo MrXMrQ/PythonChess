@@ -1,4 +1,4 @@
-from MyFigure import Figure
+from Figures.MyFigure import Figure
 
 class Rook(Figure):
     def __init__(self, name: str, start_field: tuple, is_Friend: bool = True):

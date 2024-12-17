@@ -1,5 +1,5 @@
-from MyFigure import Figure
-from MyCustomButton import Custom_Button
+from Figures.MyFigure import Figure
+from GUI.Chessboard.MyCustomButton import Custom_Button
 from tkinter import *
 
 def create_chessboard(pieces: Figure) -> dict:

@@ -1,4 +1,4 @@
-from MyFigure import Figure
+from Figures.MyFigure import Figure
 
 class Pawn(Figure):
     """
