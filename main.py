@@ -4,6 +4,7 @@ from Pieces.MyPawn import Pawn
 from Pieces.MyRook import Rook
 from Pieces.MyBishop import Bishop
 from Pieces.MyQueen import Queen
+from Pieces.MyKing import King
 
 # Chessboard
 from tkinter import *
@@ -22,9 +23,7 @@ def fill_figures() -> list:
     bishop.append(Bishop("Bishop 1", (1,3)))
     bishop.append(Bishop("Bishop 1", (1,6)))
 
-
-
-    return[pawns, rooks, bishop, [Queen("Queen", (1,4))]]
+    return[pawns, rooks, bishop, [Queen("Queen", (1,4))], [King("King", (1,5))]]
 
 pieces: Piece = fill_figures()
 chessboard = Chessboard(pieces)
