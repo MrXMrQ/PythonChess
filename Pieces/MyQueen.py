@@ -1,8 +1,8 @@
 from Pieces.MyPiece import Piece
 
 class Queen(Piece):
-    def __init__(self, name, start_field, is_Friend = True):
-        super().__init__(name, start_field, is_Friend)
+    def __init__(self, *args):
+        super().__init__(*args)
 
     def calculate_valid_moves(self, chessboard: dict) -> list:
         valid_moves = []

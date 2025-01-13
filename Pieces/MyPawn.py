@@ -12,7 +12,7 @@ class Pawn(Piece):
         is_at_end (bool): Indicates if the pawn has reached the end of the board.
     """
 
-    def __init__(self, name: str, start_field: tuple, is_Friend: bool = True, first_move: bool = True, is_at_end: bool = False) -> None:
+    def __init__(self, *args, first_move: bool = True, is_at_end: bool = False) -> None:
         """
         Initialize a Pawn instance.
 
@@ -24,9 +24,9 @@ class Pawn(Piece):
             is_at_end (bool, optional): Indicates if the pawn has reached the end of the board. Defaults to False.
         """
 
-        super().__init__(name, start_field, is_Friend)
-        self.first_move = first_move
-        self.is_at_end = is_at_end
+        super().__init__(*args)
+        self._first_move = first_move
+        self._is_at_end = is_at_end
 
     def calculate_valid_moves(self, chessboard: dict) -> list:
         """
@@ -48,7 +48,7 @@ class Pawn(Piece):
             valid_moves.append(one_step)
 
             two_steps = (row + 2, col)
-            if self.first_move and two_steps in chessboard and chessboard[two_steps] is None:
+            if self._first_move and two_steps in chessboard and chessboard[two_steps] is None:
                 valid_moves.append(two_steps)
 
         diagonal_left = (row + 1, col - 1)
@@ -84,7 +84,7 @@ class Pawn(Piece):
         """
 
         if field in chessboard:
-            self.first_move = False
+            self._first_move = False
             chessboard[self.current_field] = None
             self.current_field = field
             chessboard[field] = self
@@ -103,3 +103,19 @@ class Pawn(Piece):
                 y: widht (right_value)
         """
         return self.current_field
+
+    @property
+    def fist_move(self) -> bool:
+        return self._first_move
+    
+    @fist_move.setter
+    def fist_move(self, first_move) -> None:
+        self._first_move = first_move
+
+    @property
+    def is_at_end(self) -> bool:
+        return self._is_at_end
+    
+    @is_at_end.setter
+    def is_at_end(self, is_at_end) -> None:
+        self._is_at_end = is_at_end
