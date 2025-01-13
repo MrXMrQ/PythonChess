@@ -1,19 +1,18 @@
 from Pieces.MyPiece import Piece
 
-class King(Piece):
-    def __init__(self, *args, is_in_chess=False):
+class Knight(Piece):
+    def __init__(self, *args):
         super().__init__(*args)
-        self._is_in_chess = is_in_chess
 
     def calculate_valid_moves(self, chessboard: dict) -> list:
         valid_moves = []
-        directions = [(1, 0), (-1, 0), (0, 1), (0, -1),(1, 1), (1, -1), (-1, 1), (-1, -1)]
+        knight_moves = [(2, 1),(2, -1),(-2, 1),(-2, -1),(1, 2),(1, -2), (-1, 2),(-1, -2)]
 
-        row, col = self.current_field
-        
-        for direction in directions:
-            new_row = row + direction[0]
-            new_col = col + direction[1]
+        row, col = self.current_field  
+
+        for move in knight_moves:
+            new_row = row + move[0]
+            new_col = col + move[1]
             next_field = (new_row, new_col)
 
             if next_field in chessboard:
@@ -22,8 +21,7 @@ class King(Piece):
                     valid_moves.append(next_field)
 
         return valid_moves
-
-
+    
     def execute_valid_move(self, field: tuple, chessboard: dict) -> None:
         if field in chessboard:
             chessboard[self.current_field] = None
@@ -31,11 +29,3 @@ class King(Piece):
             chessboard[field] = self
 
         return chessboard
-    
-    @property
-    def is_in_chess(self) -> bool:
-        return self._is_in_chess
-    
-    @is_in_chess.setter
-    def is_in_chess(self, is_in_chess) -> None:
-        self._is_in_chess = is_in_chess
