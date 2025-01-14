@@ -40,11 +40,11 @@ def assign_chesspieces(board: dict, pieces: Piece) -> dict:
         dict: The updated chessboard dictionary with pieces assigned.
     """
 
-    for piece_group in range(len(pieces)):
-        for piece in pieces[piece_group]:
-            start_field: tuple = piece.start_field
-            if start_field in board:
-                board[start_field] = piece
+    for piece in pieces:
+        start_field: tuple = piece.start_field
+        
+        if start_field in board:
+            board[start_field] = piece
 
     return board
 
@@ -65,8 +65,8 @@ class Chessboard:
             pieces (list): A list of chess pieces to place on the board.
         """
 
-        self.pieces = pieces
-        self.board = create_chessboard(pieces)
+        self._pieces = pieces
+        self._board = create_chessboard(pieces)
 
     def print_formated_chessboard(self) -> None:
         """
@@ -76,11 +76,11 @@ class Chessboard:
             board (dict): A dictionary where keys represent board positions
                       and values are lists containing piece information.
         """
-        for index, key in enumerate(self.board, start=1):
-            print(self.board[key][0], end="")
+        for index, key in enumerate(self._board, start=1):
+            print(self._board[key][0], end="")
 
-            if not self.board[key][1] == None:
-                print(self.board[key][1].name, end="")
+            if not self._board[key][1] == None:
+                print(self._board[key][1].name, end="")
 
             # Add a newline after every 8 elements (end of a row)
             if index % 8 == 0:
@@ -132,7 +132,7 @@ class Chessboard:
                     self.create_label(window, i, j, text=f"{8 - i}")
 
         # Add the chessboard pieces as buttons (Custom_Button is assumed to be defined elsewhere)
-        for position, piece in self.board.items():
+        for position, piece in self._board.items():
             row, col = position
             text = f"{row} {col} "
         
@@ -141,7 +141,7 @@ class Chessboard:
         
             # Set the color for the button based on the position
             button_color = "lightgray" if (row + col) % 2 == 0 else "gray"
-            Custom_Button(window, text, button_color, position, self.board)
+            Custom_Button(window, text, button_color, position, self._board)
 
         return window
 
@@ -160,5 +160,18 @@ class Chessboard:
         
         pass
 
-    def get_board_dict(self) -> dict:
-        return self.board
+    @property
+    def pieces(self) -> list:
+        return self._pieces
+    
+    @pieces.setter
+    def pieces(self, pieces) -> None:
+        self._pieces = pieces
+
+    @property
+    def board(self) -> dict:
+        return self._board
+    
+    @board.setter
+    def board(self, board) -> None:
+        self._board = board
