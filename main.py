@@ -1,34 +1,29 @@
 # Pieces
 from Pieces.MyPiece import Piece
-from Pieces.MyPawn import Pawn
-from Pieces.MyRook import Rook
-from Pieces.MyBishop import Bishop
-from Pieces.MyQueen import Queen
-from Pieces.MyKing import King
-from Pieces.MyKnight import Knight
 
 # Chessboard
 from tkinter import *
 from GUI.Chessboard.MyChessboard import Chessboard
 
 def fill_figures() -> list:
-    pawns: Pawn = []
+    pieces: Piece = []
+    pieces.append(Piece("Rook 1", (1,1), [(1, 0), (-1, 0), (0, 1), (0, -1)], True))
+    pieces.append(Piece("Rook 2", (1,8), [(1, 0), (-1, 0), (0, 1), (0, -1)], True))
+    pieces.append(Piece("Bishop 1", (1,3), [(1, -1), (1, 1), (-1,-1), (-1,1)], True))
+    pieces.append(Piece("Bishop 1", (1,6), [(1, -1), (1, 1), (-1,-1), (-1,1)], True))
+    pieces.append(Piece("Queen", (1,4), [(1, 0), (-1, 0), (0, 1), (0, -1), (1, -1), (1, 1), (-1,-1), (-1,1)], True))
+
+    pieces.append(Piece("Knight 1", (1,2), [(2, 1),(2, -1),(-2, 1),(-2, -1),(1, 2),(1, -2), (-1, 2),(-1, -2)], True, True))
+    pieces.append(Piece("Knight 1", (1,7), [(2, 1),(2, -1),(-2, 1),(-2, -1),(1, 2),(1, -2), (-1, 2),(-1, -2)], True, True))
+    
+    pieces.append(Piece("King", (1,5), [(1, 0), (-1, 0), (0, 1), (0, -1),(1, 1), (1, -1), (-1, 1), (-1, -1)], True, True))
+
+    pieces.append(Piece("Enemy", (5,5), [(0,0)], False))
+
     for i in range(8):
-        pawns.append(Pawn("Pawn {}".format(i + 1), (2,i + 1)))
+        pieces.append(Piece("Pawn {}".format(i + 1), (2,i + 1), [(1, 0)], True, True, True))
 
-    rooks: Rook = []
-    rooks.append(Rook("Rook 1", (1,1)))
-    rooks.append(Rook("Rook 2", (1,8)))
-
-    bishop: Bishop = []
-    bishop.append(Bishop("Bishop 1", (1,3)))
-    bishop.append(Bishop("Bishop 1", (1,6)))
-
-    knight: Knight = []
-    knight.append(Knight("Knight 1", (1,2)))
-    knight.append(Knight("Knight 1", (1,7)))
-
-    return[pawns, rooks, bishop, knight, [Queen("Queen", (1,4))], [King("King", (1,5))]]
+    return pieces
 
 pieces: Piece = fill_figures()
 chessboard = Chessboard(pieces)
