@@ -1,5 +1,5 @@
 class Piece:
-    def __init__(self, name: str, start_field: tuple, move_directions: list, is_friend: bool = True) -> None:
+    def __init__(self, name: str, start_field: tuple, move_directions: list, team: str = "white") -> None:
         if not isinstance(name, str):
             raise TypeError(f"ERROR: 'name' must be type 'str' not {type(name)}")
         
@@ -9,14 +9,14 @@ class Piece:
         if not isinstance(move_directions, list):
             raise TypeError(f"ERROR: 'move_directions' must be type 'list' not {type(start_field)}")
         
-        if not isinstance(is_friend, bool):
-            raise TypeError(f"ERROR: 'is_friend' must be type 'bool' not {type(start_field)}")
+        if not isinstance(team, str):
+            raise TypeError(f"ERROR: 'is_friend' must be type 'str' not {type(start_field)}")
         
         self._name = name
         self._start_field = start_field
         self._current_field = start_field
         self._directions = move_directions
-        self._is_friend = is_friend
+        self._team = team
 
     def compute_moves(self, chessboard: dict) -> list:
         if not isinstance(chessboard, dict):
@@ -37,9 +37,16 @@ class Piece:
                     break
 
                 if chessboard[next_field] is not None:
-                    if not chessboard[next_field].is_friend:
-                        valid_moves.append(next_field)
-                    break 
+                    if self._team == "white":
+                        if not chessboard[next_field]._team == "white":
+                            valid_moves.append(next_field)
+                        break
+                    elif self._team == "black":
+                        if not chessboard[next_field]._team == "black":
+                            valid_moves.append(next_field)
+                        break
+                    else:
+                        raise ValueError(f"ERROR: object have no team: {self._team}")
 
                 valid_moves.append(next_field)
 
@@ -54,7 +61,7 @@ class Piece:
         return chessboard
 
     def __str__(self) -> str:
-        return f"Name: {self._name}, Start field: {self._start_field}, Current field: {self._current_field} Friend: {self._is_friend}"
+        return f"Name: {self._name}, Start field: {self._start_field}, Current field: {self._current_field} Friend: {self._team}"
     
     @property
     def name(self) -> str:
@@ -87,5 +94,5 @@ class Piece:
         return self._directions
 
     @property
-    def is_friend(self) -> str:
-        return self._is_friend
+    def team(self) -> str:
+        return self._team

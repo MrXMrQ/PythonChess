@@ -19,7 +19,12 @@ class LimitedRangePiece(Piece):
             next_field = (new_row, new_col)
 
             if next_field in chessboard:
-                if chessboard[next_field] is None or not chessboard[next_field].is_friend:
-                    valid_moves.append(next_field)
-
+                if self._team == "white":
+                    if chessboard[next_field] is None or not chessboard[next_field]._team == "white":
+                        valid_moves.append(next_field)
+                elif self._team == "black":
+                    if chessboard[next_field] is None or not chessboard[next_field]._team == "black":
+                        valid_moves.append(next_field)
+                else:
+                    raise ValueError(f"ERROR: object have no team: {self._team}")
         return valid_moves

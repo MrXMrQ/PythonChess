@@ -12,12 +12,79 @@ class Pawn(Piece):
         super().__init__(*args, **kwargs)
 
     def __str__(self) -> str:
-        return super().__str__() + f", {self._is_friend}"
+        return super().__str__() + f", {self._team}"
+
+    @override
+    def compute_moves(self, chessboard: dict) -> list:
+        valid_moves = []
+        row, col = self.current_field
+        print(row, col)
+
+        if self._team == "white":
+            one_step = (row + 1, col)
+        elif self._team == "black":
+            one_step = (row - 1, col)
+        else:
+            raise ValueError(f"ERROR: object have no team: {self._team}")
+
+        if one_step in chessboard and chessboard[one_step] is None:
+            valid_moves.append(one_step)
+
+            if self._team == "white":
+                two_steps = (row + 2, col)
+            elif self._team == "black":
+                two_steps = (row - 2, col)
+            else:
+                raise ValueError(f"ERROR: object have no team: {self._team}")
+
+            if not self._first_move and two_steps in chessboard and chessboard[two_steps] is None:
+                valid_moves.append(two_steps)
+
+        if self._team == "white":
+            diagonal_left = (row + 1, col - 1)
+            diagonal_right = (row + 1, col + 1)
+        elif self._team == "black":
+            diagonal_left = (row - 1, col - 1)
+            diagonal_right = (row - 1, col + 1)
+        else:
+            raise ValueError(f"ERROR: object have no team: {self._team}")
+
+        if diagonal_left in chessboard and chessboard[diagonal_left] is not None:
+            if self._team == "white":
+                if not chessboard[diagonal_left]._team == "white":
+                    valid_moves.append(diagonal_left)
+            elif self._team == "black":
+                if not chessboard[diagonal_left]._team == "black":
+                    valid_moves.append(diagonal_left)
+            else:
+                raise ValueError(f"ERROR: object have no team: {self._team}")
+
+        if diagonal_right in chessboard and chessboard[diagonal_right] is not None:
+            if self._team == "white":
+                if not chessboard[diagonal_right]._team == "white":
+                    valid_moves.append(diagonal_right)
+            elif self._team == "black":
+                if not chessboard[diagonal_right]._team == "black":
+                    valid_moves.append(diagonal_right)
+            else:
+                raise ValueError(f"ERROR: object have no team: {self._team}")
+        
+        return valid_moves
     
-    def replace(self, piece: Piece, chessboard: dict) -> None:
-        chessboard[self._current_field] = piece
+    @override
+    def apply_move(self, field: tuple, chessboard: dict) -> None:
+        self._first_move = True
+
+        board = super().apply_move(field, chessboard)
+
+        if self._current_field[0] == 8:
+            self.open_popup(chessboard, "white")
+        elif self._current_field[0] == 1:
+            self.open_popup(chessboard, "black")
+
+        return board
     
-    def open_popup(self, chessboard: dict) -> None:
+    def open_popup(self, chessboard: dict, team: str) -> None:
         popup = Toplevel(self._window)
         popup.geometry("400x400")
         popup.title("Promotion Selection")
@@ -35,54 +102,20 @@ class Pawn(Piece):
 
         btn_style = {"font": ('Helvetica', 22, 'bold'), "padx": 5, "pady": 5}
 
-        knight = LimitedRangePiece("♘", self._current_field, [(2, 1),(2, -1),(-2, 1),(-2, -1),(1, 2),(1, -2), (-1, 2),(-1, -2)])
-        rook = Piece("♖", self._current_field, [(1, 0), (-1, 0), (0, 1), (0, -1)])
-        bishop = Piece("♗", self._current_field, [(1, -1), (1, 1), (-1,-1), (-1,1)])
-        queen = Piece("♕", self._current_field, [(1, 0), (-1, 0), (0, 1), (0, -1), (1, -1), (1, 1), (-1,-1), (-1,1)])
+        knight = LimitedRangePiece("♘" if team == "white" else "♞", self._current_field, [(2, 1),(2, -1),(-2, 1),(-2, -1),(1, 2),(1, -2), (-1, 2),(-1, -2)], team)
+        rook = Piece("♖" if team == "white" else "♜", self._current_field, [(1, 0), (-1, 0), (0, 1), (0, -1)], team)
+        bishop = Piece("♗" if team == "white" else "♝", self._current_field, [(1, -1), (1, 1), (-1,-1), (-1,1)], team)
+        queen = Piece("♕" if team == "white" else "♛", self._current_field, [(1, 0), (-1, 0), (0, 1), (0, -1), (1, -1), (1, 1), (-1,-1), (-1,1)], team)
         
-        Button(popup, text="♘", command=lambda: [self.replace(knight, chessboard), popup.destroy()], **btn_style).pack(pady=10)
-        Button(popup, text="♖", command=lambda: [self.replace(rook, chessboard), popup.destroy()], **btn_style).pack(pady=10)
-        Button(popup, text="♗", command=lambda: [self.replace(bishop, chessboard), popup.destroy()], **btn_style).pack(pady=10)
-        Button(popup, text="♕", command=lambda: [self.replace(queen, chessboard), popup.destroy()], **btn_style).pack(pady=10)
+        Button(popup, text="♘" if team == "white" else "♞", command=lambda: [self.replace(knight, chessboard), popup.destroy()], **btn_style).pack(pady=10)
+        Button(popup, text="♖" if team == "white" else "♜", command=lambda: [self.replace(rook, chessboard), popup.destroy()], **btn_style).pack(pady=10)
+        Button(popup, text="♗" if team == "white" else "♝", command=lambda: [self.replace(bishop, chessboard), popup.destroy()], **btn_style).pack(pady=10)
+        Button(popup, text="♕" if team == "white" else "♛", command=lambda: [self.replace(queen, chessboard), popup.destroy()], **btn_style).pack(pady=10)
 
         self._window.wait_window(popup) 
 
-    @override
-    def compute_moves(self, chessboard: dict) -> list:
-        valid_moves = []
-        row, col = self.current_field
-    
-        one_step = (row + 1, col)
-        if one_step in chessboard and chessboard[one_step] is None:
-            valid_moves.append(one_step)
-
-            two_steps = (row + 2, col)
-            if not self._first_move and two_steps in chessboard and chessboard[two_steps] is None:
-                valid_moves.append(two_steps)
-
-        diagonal_left = (row + 1, col - 1)
-        diagonal_right = (row + 1, col + 1)
-
-        if diagonal_left in chessboard and chessboard[diagonal_left] is not None:
-            if not chessboard[diagonal_left].is_friend:
-                valid_moves.append(diagonal_left)
-
-        if diagonal_right in chessboard and chessboard[diagonal_right] is not None:
-            if not chessboard[diagonal_right].is_friend:
-                valid_moves.append(diagonal_right)
-
-        return valid_moves
-    
-    @override
-    def apply_move(self, field: tuple, chessboard: dict) -> None:
-        self._first_move = True
-
-        board = super().apply_move(field, chessboard)
-
-        if self.current_field[0] == 8:
-            self.open_popup(chessboard)
-
-        return board
+    def replace(self, piece: Piece, chessboard: dict) -> None:
+        chessboard[self._current_field] = piece
     
     @property
     def first_move(self) -> bool:
