@@ -1,88 +1,137 @@
+
 from tkinter import RAISED, Button
-from tkinter import Tk
-from Pieces.pawn import Pawn
+
+from Pieces.piece import Piece
+from Pieces.rook import Rook
+from Pieces.king import King
+
+from GUI.chessboard import Chessboard
 
 class CustomButton(Button):
     _button_registry: dict = {}
-    _last_highlighted_move_options: list = []
-    _last_marked_buttons: list = []
+    _marked_buttons: list= []
+    _move_options: list = []
     _last_button = None
 
-    def __init__(self, window: Tk, text: str, bg_color: str, k_value: tuple, chessboard: dict) -> None:
-        super().__init__(window, text=text, bg=bg_color, command=self._on_left_click, font=('Helvetica', 30, 'bold'), relief=RAISED)
+    def __init__(self, content: Piece, chessboard_console: Chessboard, root, grid) -> None:
+        self._content = content
+        self._chessboard_console = chessboard_console
+        self._bg = "lightgray" if (grid[0] + grid[1]) % 2 == 0 else "gray"
+        self._grid = grid
 
-        self._bg_color = bg_color
-        self._key_value = k_value
-        self._chessboard = chessboard
-        self.grid(row=8-k_value[0], column=k_value[1], sticky="nsew")
-
+        super().__init__(master=root, 
+                         text=content.name if content is not None else "", 
+                         bg=self._bg, 
+                         command=self._on_left_click, 
+                         font=('Helvetica', 30, 'bold'), 
+                         relief=RAISED
+                        )
+        self.grid(row=8-grid[0], column=grid[1], sticky="nsew")
         self.bind("<Button-3>", self._on_right_click)
-        CustomButton._button_registry.update([(k_value, self)])
+        CustomButton._button_registry.update([(grid, self)])
+
+    def _on_right_click(self, event) -> None:
+        if self in CustomButton._marked_buttons:
+            self.config(bg=self._bg)
+            CustomButton._marked_buttons.remove(self)
+            return
+        
+        CustomButton._marked_buttons.append(self)
+        self.config(bg="Green")
 
     def _on_left_click(self) -> None:
         self._move()
 
         if CustomButton._last_button:
             if CustomButton._last_button == self:
-                self.config(bg=self._bg_color)
+                self.config(bg=self._bg)
                 CustomButton._last_button = None
-                self._reset_highlight()
-                return
-            CustomButton._last_button.config(bg=CustomButton._last_button._bg_color)
-            CustomButton._last_button = None
-            self._reset_highlight()
-        
-        if self._has_piece():
+            else:
+                CustomButton._last_button.config(bg=CustomButton._last_button._bg)
+                CustomButton._last_button = None
+
+            self._reset_hightlight()
+
+        # highlight move for selected piece
+        if self._content is not None:
             CustomButton._last_button = self
             self.config(bg="Blue")
-            self._highlight()
+            self._hightlight()
 
-    def _on_right_click(self, event) -> None:
-        if self in CustomButton._last_marked_buttons:
-            self.config(bg=self._bg_color)
-            CustomButton._last_marked_buttons.remove(self)
-            return
+    def _hightlight(self) -> None:
+        valid_moves = self._content.compute_moves(Chessboard.chessboard)
 
-        self.config(bg="Green")
-        CustomButton._last_marked_buttons.append(self)
-
-    def _has_piece(self) -> bool:
-        return self._chessboard.get(self._key_value) is not None
-    
-    def _reset_highlight(self) -> None:
-        self.config(bg=self._bg_color)
-
-        for i in CustomButton._last_highlighted_move_options:
-            if i._chessboard[i._key_value] is None:
-                i.config(text="")
-            else:
-                i.config(bg=i._bg_color)
-
-        CustomButton._last_highlighted_move_options.clear()
-
-    def _highlight(self) -> None:
-        valid_moves = self._chessboard[self._key_value].compute_moves(self._chessboard)
+        if isinstance(self._content, Rook):
+            if self._content.castle(Chessboard.chessboard) is not None:
+                valid_moves.append(self._content.castle(Chessboard.chessboard))
 
         for move in valid_moves:
-            target_button = self._button_registry[move]
-            if target_button._chessboard[move] is None:
-                target_button.config(text="•")
+            button = CustomButton._button_registry[move]
+
+            if Chessboard.chessboard[move] is None:
+                button.config(text="•")
             else:
-                target_button.config(bg="Yellow", )        
-            self._last_highlighted_move_options.append(target_button)    
-    
+                button.config(bg="Yellow")
+
+            self._move_options.append(button)
+            
+    def _reset_hightlight(self) -> None:
+        self.config(bg=self._bg)
+
+        for button in CustomButton._move_options:
+            if Chessboard.chessboard[button._grid] is None:
+                button.config(text="")
+            else:
+                button.config(bg=button._bg)
+
+        CustomButton._move_options.clear()
+
     def _move(self) -> None:
-        for i in CustomButton._last_marked_buttons:
-            i.config(bg=i._bg_color)
+        # reset buttons that are marked with right click
+        for button in CustomButton._marked_buttons:
+            button.config(bg=button._bg)
 
-        CustomButton._last_marked_buttons.clear()
+        CustomButton._marked_buttons.clear()
 
-        for i in self._last_highlighted_move_options:
-            if self == i and self._key_value in self._chessboard:
-                # Check for Pawn to change first move
-                if isinstance(self._last_button._chessboard[self._last_button._key_value], Pawn):
-                    self._last_button._chessboard[self._last_button._key_value].first_move = True    
+        # perform move
+        for button in CustomButton._move_options:
+            if self == button:
+                # castle check
+                if isinstance(CustomButton._last_button._content, Rook) and isinstance(self._content, King):
+                    Chessboard.chessboard = CustomButton._last_button._content.apply_move(self._grid, Chessboard.chessboard)
 
-                self._last_button._chessboard[self._last_button._key_value].apply_move(self._key_value, self._chessboard)
-                self._button_registry[self._last_button._key_value].config(text="")
-                self.config(text=self._chessboard[self._key_value].name)
+                    self.config(text="")
+                    CustomButton._last_button.config(text="")
+                    self._content = None
+                    CustomButton._last_button._content = None
+
+                    pos1 = (self._grid[0], self._grid[1] + 1)
+                    pos2 = (self._grid[0], self._grid[1] + 2)
+
+                    b1 = CustomButton._button_registry[pos1]
+                    b2 = CustomButton._button_registry[pos2]
+
+                    b1._content = Chessboard.chessboard[pos1]
+                    b2._content = Chessboard.chessboard[pos2]
+                    b1._content.current_field = pos1
+                    b2._content.current_field = pos2
+
+                    b1.config(text=b1._content.name)
+                    b2.config(text=b2._content.name)
+
+                    print(self._chessboard_console)
+
+                    return
+                
+                # we have to move the conteten from the last button to the new button
+                self._content = CustomButton._last_button._content
+                CustomButton._last_button._content = None
+
+                self._content.moved = True
+                Chessboard.chessboard = self._content.apply_move(self._grid, Chessboard.chessboard)
+
+                # console chessboard
+                print(self._chessboard_console)
+
+                CustomButton._last_button.config(text="")
+                self.config(text=self._content.name)
