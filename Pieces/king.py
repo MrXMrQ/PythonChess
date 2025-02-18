@@ -1,10 +1,8 @@
-from Pieces.piece import Piece
+from Pieces.limited_range_piece import LimitedRangePiece
 
 from typing import override
 
-
-
-class LimitedRangePiece(Piece):
+class King(LimitedRangePiece):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
@@ -30,3 +28,9 @@ class LimitedRangePiece(Piece):
                 else:
                     raise ValueError(f"ERROR: object have no team: {self._team}")
         return valid_moves
+
+    def check(self) -> None:
+        pass
+
+    def check_mate(self) -> None:
+        pass

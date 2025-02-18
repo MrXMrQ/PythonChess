@@ -17,6 +17,7 @@ class Piece:
         self._current_field = start_field
         self._directions = move_directions
         self._team = team
+        self._moved = False
 
     def compute_moves(self, chessboard: dict) -> list:
         if not isinstance(chessboard, dict):
@@ -96,3 +97,14 @@ class Piece:
     @property
     def team(self) -> str:
         return self._team
+    
+    @property
+    def moved(self) -> bool:
+        return self._moved
+    
+    @moved.setter
+    def moved(self, other) -> None:
+        if not isinstance(other, bool):
+            raise ValueError(f"ERROR: 'first_move' must be type 'bool' not type {type(other)}")
+        
+        self._moved = other

@@ -1,12 +1,14 @@
-from math import pi
-from typing import override
-from tkinter import *
-from Pieces.piece import Piece
+from tkinter import Tk, Button, Toplevel, Label
+
 from Pieces.limited_range_piece import LimitedRangePiece
+from Pieces.piece import Piece
+
+from GUI.custom_button import CustomButton
+
+from typing import override
 
 class Pawn(Piece):
     def __init__(self, *args, **kwargs) -> None:
-        self._first_move = False
         self._window = None
 
         super().__init__(*args, **kwargs)
@@ -36,7 +38,7 @@ class Pawn(Piece):
             else:
                 raise ValueError(f"ERROR: object have no team: {self._team}")
 
-            if not self._first_move and two_steps in chessboard and chessboard[two_steps] is None:
+            if not self._moved and two_steps in chessboard and chessboard[two_steps] is None:
                 valid_moves.append(two_steps)
 
         if self._team == "white":
@@ -72,8 +74,6 @@ class Pawn(Piece):
     
     @override
     def apply_move(self, field: tuple, chessboard: dict) -> None:
-        self._first_move = True
-
         board = super().apply_move(field, chessboard)
 
         if self._current_field[0] == 8:
@@ -115,15 +115,7 @@ class Pawn(Piece):
 
     def replace(self, piece: Piece, chessboard: dict) -> None:
         chessboard[self._current_field] = piece
-    
-    @property
-    def first_move(self) -> bool:
-        return self._first_move
-    
-    @first_move.setter
-    def first_move(self, other) -> None:
-        if not isinstance(other, bool):
-            raise ValueError(f"ERROR: 'first_move' must be type 'bool' not type {type(other)}")
+        CustomButton._button_registry[self.current_field]._content = piece
         
     @property
     def window(self) -> Tk:
