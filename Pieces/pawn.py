@@ -18,7 +18,6 @@ class Pawn(Piece):
     def compute_moves(self, chessboard: dict) -> list:
         valid_moves = []
         row, col = self.current_field
-        print(row, col)
 
         if self._team == "white":
             one_step = (row + 1, col)
