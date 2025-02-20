@@ -37,8 +37,6 @@ class Rook(Piece):
             chessboard[(self._current_field[0], 8 if king_field[1] < self._current_field[1] else 1)] = None
             chessboard[(king_field[0], 5)] = None
 
-            print((self._current_field[0], 8 if king_field[1] < self._current_field[1] else 1))
-
             return {0: chessboard, 1: new_king_field, 2: new_rook_field}
         
         return super().apply_move(king_field, chessboard)
@@ -62,8 +60,6 @@ class Rook(Piece):
                 if isinstance(chessboard[i], King):
                     king_field = i
                 fields.append(i)
-
-        print(king_field, fields)
 
         if king_field is None:
             return []
