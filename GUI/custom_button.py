@@ -1,6 +1,7 @@
 
 from tkinter import RAISED, Button
 
+from GUI import chessboard
 from Pieces.piece import Piece
 from Pieces.rook import Rook
 from Pieces.king import King
@@ -98,24 +99,19 @@ class CustomButton(Button):
             if self == button:
                 # castle check
                 if isinstance(CustomButton._last_button._content, Rook) and isinstance(self._content, King):
-                    Chessboard.chessboard = CustomButton._last_button._content.apply_move(self._grid, Chessboard.chessboard)
+                    values = CustomButton._last_button._content.apply_move(self._grid, Chessboard.chessboard)
+                    Chessboard.chessboard = values[0]
 
                     self.config(text="")
                     CustomButton._last_button.config(text="")
                     self._content = None
                     CustomButton._last_button._content = None
 
-                    pos1 = (self._grid[0], self._grid[1] + 1)
-                    pos2 = (self._grid[0], self._grid[1] + 2)
+                    b1 = CustomButton._button_registry[values[1]]
+                    b2 = CustomButton._button_registry[values[2]]
 
-                    b1 = CustomButton._button_registry[pos1]
-                    b2 = CustomButton._button_registry[pos2]
-
-                    b1._content = Chessboard.chessboard[pos1]
-                    b2._content = Chessboard.chessboard[pos2]
-                    b1._content.current_field = pos1
-                    b2._content.current_field = pos2
-
+                    b1._content = Chessboard.chessboard[values[1]]
+                    b2._content = Chessboard.chessboard[values[2]]
                     b1.config(text=b1._content.name)
                     b2.config(text=b2._content.name)
 

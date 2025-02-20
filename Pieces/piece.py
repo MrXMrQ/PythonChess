@@ -55,10 +55,12 @@ class Piece:
     
     def apply_move(self, field: tuple, chessboard: dict) -> None:
         if field in chessboard:
-            chessboard[self.current_field] = None
+            self._moved = True
+            chessboard[field], chessboard[self._current_field] = chessboard[self._current_field], None
             self.current_field = field
-            chessboard[field] = self
-
+        else:
+            raise KeyError(f"ERROR: {field} not in chessboard")
+        
         return chessboard
 
     def __str__(self) -> str:
