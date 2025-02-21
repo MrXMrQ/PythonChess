@@ -1,4 +1,5 @@
 
+from cgitb import text
 from tkinter import RAISED, Button
 
 from GUI import chessboard
@@ -41,7 +42,14 @@ class CustomButton(Button):
         self.config(bg="Green")
 
     def _on_left_click(self) -> None:
-        self._move()
+        if self._move():
+            player = "White" if Chessboard.turn % 2 == 1 else "Black"
+            print(f"{player} moved piece {self._content}")
+            self._reset_hightlight()
+            return
+
+        if self._track_turn():
+            return
 
         if CustomButton._last_button:
             if CustomButton._last_button == self:
@@ -58,6 +66,27 @@ class CustomButton(Button):
             CustomButton._last_button = self
             self.config(bg="Blue")
             self._hightlight()
+
+    def _track_turn(self) -> bool:
+        if self._content is None:
+            return False
+
+        turn_white = Chessboard.turn % 2 == 0
+        piece_white = self._content._team == "white"
+        piece_black = self._content._team == "black"
+
+        if turn_white:
+            if not piece_white:
+                print("\rIt's White's turn, not Black's.")
+                return True
+            print(f"\rWhite selects the piece {self._content}")
+        else:
+            if not piece_black:
+                print("\rIt's Black's turn, not White's.")
+                return True
+            print(f"\rBlack selects the piece {self._content}")
+
+        return
 
     def _hightlight(self) -> None:
         valid_moves = self._content.compute_moves(Chessboard.chessboard)
@@ -79,6 +108,10 @@ class CustomButton(Button):
     def _reset_hightlight(self) -> None:
         self.config(bg=self._bg)
 
+        if CustomButton._last_button:
+            CustomButton._last_button.config(text="", bg=CustomButton._last_button._bg)
+            CustomButton._last_button = None
+
         for button in CustomButton._move_options:
             if Chessboard.chessboard[button._grid] is None:
                 button.config(text="")
@@ -87,7 +120,7 @@ class CustomButton(Button):
 
         CustomButton._move_options.clear()
 
-    def _move(self) -> None:
+    def _move(self) -> bool:
         # reset buttons that are marked with right click
         for button in CustomButton._marked_buttons:
             button.config(bg=button._bg)
@@ -115,9 +148,9 @@ class CustomButton(Button):
                     b1.config(text=b1._content.name)
                     b2.config(text=b2._content.name)
 
-                    print(self._chessboard_console)
+                    print(f"\n{self._chessboard_console}")
 
-                    return
+                    return True
                 
                 # we have to move the conteten from the last button to the new button
                 self._content = CustomButton._last_button._content
@@ -127,7 +160,13 @@ class CustomButton(Button):
                 Chessboard.chessboard = self._content.apply_move(self._grid, Chessboard.chessboard)
 
                 # console chessboard
-                print(self._chessboard_console)
+                print(f"\n{self._chessboard_console}")
 
                 CustomButton._last_button.config(text="")
                 self.config(text=self._content.name)
+
+                self.config(bg=self._bg)
+
+                Chessboard.turn += 1
+
+                return True

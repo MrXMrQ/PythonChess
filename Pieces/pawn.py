@@ -13,9 +13,6 @@ class Pawn(Piece):
 
         super().__init__(*args, **kwargs)
 
-    def __str__(self) -> str:
-        return super().__str__() + f", {self._team}"
-
     @override
     def compute_moves(self, chessboard: dict) -> list:
         valid_moves = []

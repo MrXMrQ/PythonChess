@@ -9,7 +9,6 @@ from Pieces.rook import Rook
 from GUI.custom_button import CustomButton
 from GUI.chessboard import Chessboard
 
-
 def fill_figures() -> list:
     rooks = [Rook("♖", (1,1), [(1, 0), (-1, 0), (0, 1), (0, -1)]), 
              Rook("♖", (1,8), [(1, 0), (-1, 0), (0, 1), (0, -1)]),

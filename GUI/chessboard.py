@@ -1,6 +1,7 @@
 from Pieces.piece import Piece
 
 class Chessboard:
+    turn: int = 0
     chessboard: dict = None
 
     def __init__(self, pieces: list) -> None:
