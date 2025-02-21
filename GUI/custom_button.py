@@ -1,13 +1,14 @@
 
 from cgitb import text
-from tkinter import RAISED, Button
+from tkinter import NO, RAISED, Button
 
-from GUI import chessboard
 from Pieces.piece import Piece
 from Pieces.rook import Rook
 from Pieces.king import King
 
+from GUI.custom_banner import CustomBanner
 from GUI.chessboard import Chessboard
+
 
 class CustomButton(Button):
     _button_registry: dict = {}
@@ -15,10 +16,11 @@ class CustomButton(Button):
     _move_options: list = []
     _last_button = None
 
-    def __init__(self, content: Piece, chessboard_console: Chessboard, root, grid) -> None:
+    def __init__(self, content: Piece, chessboard_console: Chessboard, banner: CustomBanner, root, grid) -> None:
         self._content = content
         self._chessboard_console = chessboard_console
-        self._bg = "lightgray" if (grid[0] + grid[1]) % 2 == 0 else "gray"
+        self._banner = banner
+        self._bg = "#efdab6" if (grid[0] + grid[1]) % 2 == 0 else "#b58963"
         self._grid = grid
 
         super().__init__(master=root, 
@@ -44,7 +46,7 @@ class CustomButton(Button):
     def _on_left_click(self) -> None:
         if self._move():
             player = "White" if Chessboard.turn % 2 == 1 else "Black"
-            print(f"{player} moved piece {self._content}")
+            self._banner.change_text(f"{player} moved piece", (self._content.name, self._content._last_field, self._content.current_field))
             self._reset_hightlight()
             return
 
@@ -77,14 +79,14 @@ class CustomButton(Button):
 
         if turn_white:
             if not piece_white:
-                print("\rIt's White's turn, not Black's.")
+                self._banner.change_text("It's White's turn, not Black's.", None)
                 return True
-            print(f"\rWhite selects the piece {self._content}")
+            self._banner.change_text(f"White selects the piece", (self._content.name, self._content._last_field, self._content.current_field))
         else:
             if not piece_black:
-                print("\rIt's Black's turn, not White's.")
+                self._banner.change_text("It's Black's turn, not White's.", None)
                 return True
-            print(f"\rBlack selects the piece {self._content}")
+            self._banner.change_text(f"Black selects the piece", (self._content.name, self._content._last_field, self._content.current_field))
 
         return
 
