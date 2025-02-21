@@ -6,6 +6,8 @@ from Pieces.king import King
 
 from typing import override
 
+from GUI.custom_banner import CustomBanner
+
 class Rook(Piece):
     def __init__(self, *args, **kwargs) -> None:
         self._can_castle = True
@@ -13,7 +15,7 @@ class Rook(Piece):
         super().__init__(*args, **kwargs)
 
     @override
-    def apply_move(self, king_field: tuple, chessboard: dict) -> dict:
+    def apply_move(self, king_field: tuple, chessboard: dict, banner: CustomBanner) -> dict:
         if isinstance (chessboard[king_field], King) and self._can_castle:
             self._can_castle = False
             self._moved = True,
@@ -39,7 +41,7 @@ class Rook(Piece):
 
             return {0: chessboard, 1: new_king_field, 2: new_rook_field}
         
-        return super().apply_move(king_field, chessboard)
+        return super().apply_move(king_field, chessboard, banner)
     
     def castle(self, chessboard: dict) -> tuple:
         specific_fields = self.field_between_rook_and_king(chessboard, [])

@@ -1,13 +1,18 @@
+from GUI.custom_banner import CustomBanner
+
 class Piece:
-    def __init__(self, name: str, start_field: tuple, move_directions: list, team: str = "white") -> None:
+    def __init__(self, name: str, start_field: tuple, directions: list, score: int, team: str = "white") -> None:
         if not isinstance(name, str):
             raise TypeError(f"ERROR: 'name' must be type 'str' not {type(name)}")
         
         if not isinstance(start_field, tuple):
             raise TypeError(f"ERROR: 'start_field' must be type 'tuple' not {type(start_field)}")
         
-        if not isinstance(move_directions, list):
+        if not isinstance(directions, list):
             raise TypeError(f"ERROR: 'move_directions' must be type 'list' not {type(start_field)}")
+        
+        if not isinstance(score, int):
+            raise TypeError(f"ERROR: 'score' must be type 'int' not {type(score)}")
         
         if not isinstance(team, str):
             raise TypeError(f"ERROR: 'is_friend' must be type 'str' not {type(start_field)}")
@@ -15,7 +20,9 @@ class Piece:
         self._name = name
         self._start_field = start_field
         self._current_field = start_field
-        self._directions = move_directions
+        self._last_field = start_field
+        self._directions = directions
+        self._score = score
         self._team = team
         self._moved = False
 
@@ -53,10 +60,14 @@ class Piece:
 
         return valid_moves
     
-    def apply_move(self, field: tuple, chessboard: dict) -> None:
+    def apply_move(self, field: tuple, chessboard: dict, banner: CustomBanner) -> None:
         if field in chessboard:
+            if chessboard[field] is not None:
+                banner.update_scorepoint(chessboard[field]._score, self._team)
+
             self._moved = True
             chessboard[field], chessboard[self._current_field] = chessboard[self._current_field], None
+            self._last_field = self._current_field
             self.current_field = field
         else:
             raise KeyError(f"ERROR: {field} not in chessboard")
@@ -82,7 +93,7 @@ class Piece:
         return self._start_field
 
     @property
-    def current_field(self) -> str:
+    def current_field(self) -> tuple:
         return self._current_field
     
     @current_field.setter
@@ -93,8 +104,23 @@ class Piece:
         self._current_field = other
 
     @property
+    def last_field(self) -> tuple:
+        return self._last_field
+    
+    @last_field.setter
+    def last_field(self, other) -> None:
+        if not isinstance(other, tuple):
+            raise TypeError(f"ERROR: 'last_field' must be type 'tuple' not {type(other)}")
+
+        self._last_field = other
+
+    @property
     def directions(self) -> list:
         return self._directions
+    
+    @property
+    def score(self) -> int:
+        return self._score
 
     @property
     def team(self) -> str:

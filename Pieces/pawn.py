@@ -1,5 +1,6 @@
 from tkinter import Tk, Button, Toplevel, Label
 
+from GUI.custom_banner import CustomBanner
 from Pieces.limited_range_piece import LimitedRangePiece
 from Pieces.piece import Piece
 
@@ -70,8 +71,8 @@ class Pawn(Piece):
         return valid_moves
     
     @override
-    def apply_move(self, field: tuple, chessboard: dict) -> None:
-        board = super().apply_move(field, chessboard)
+    def apply_move(self, field: tuple, chessboard: dict, banner: CustomBanner) -> None:
+        board = super().apply_move(field, chessboard, banner)
 
         if self._current_field[0] == 8:
             self.open_popup(chessboard, "white")

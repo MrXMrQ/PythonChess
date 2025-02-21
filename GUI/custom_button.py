@@ -45,8 +45,7 @@ class CustomButton(Button):
 
     def _on_left_click(self) -> None:
         if self._move():
-            player = "White" if Chessboard.turn % 2 == 1 else "Black"
-            self._banner.change_text(f"{player} moved piece", (self._content.name, self._content._last_field, self._content.current_field))
+            print(f"\n{self._chessboard_console}")
             self._reset_hightlight()
             return
 
@@ -123,6 +122,8 @@ class CustomButton(Button):
         CustomButton._move_options.clear()
 
     def _move(self) -> bool:
+        
+
         # reset buttons that are marked with right click
         for button in CustomButton._marked_buttons:
             button.config(bg=button._bg)
@@ -132,9 +133,13 @@ class CustomButton(Button):
         # perform move
         for button in CustomButton._move_options:
             if self == button:
+                Chessboard.turn += 1
+                player = "White" if Chessboard.turn % 2 == 1 else "Black"
+
                 # castle check
                 if isinstance(CustomButton._last_button._content, Rook) and isinstance(self._content, King):
-                    values = CustomButton._last_button._content.apply_move(self._grid, Chessboard.chessboard)
+                    values = CustomButton._last_button._content.apply_move(self._grid, Chessboard.chessboard, self._banner)
+                
                     Chessboard.chessboard = values[0]
 
                     self.config(text="")
@@ -150,25 +155,22 @@ class CustomButton(Button):
                     b1.config(text=b1._content.name)
                     b2.config(text=b2._content.name)
 
-                    print(f"\n{self._chessboard_console}")
+                    self._banner.change_text(f"{player} CASTLE", None)
 
                     return True
                 
-                # we have to move the conteten from the last button to the new button
                 self._content = CustomButton._last_button._content
                 CustomButton._last_button._content = None
 
                 self._content.moved = True
-                Chessboard.chessboard = self._content.apply_move(self._grid, Chessboard.chessboard)
-
-                # console chessboard
-                print(f"\n{self._chessboard_console}")
+                Chessboard.chessboard = self._content.apply_move(self._grid, Chessboard.chessboard, self._banner)
 
                 CustomButton._last_button.config(text="")
                 self.config(text=self._content.name)
 
                 self.config(bg=self._bg)
 
-                Chessboard.turn += 1
+                player = "White" if Chessboard.turn % 2 == 1 else "Black"
+                self._banner.change_text(f"{player} moved piece", (self._content.name, self._content._last_field, self._content.current_field))
 
                 return True

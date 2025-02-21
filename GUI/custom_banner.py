@@ -1,5 +1,5 @@
 from tkinter import Frame, Label
-from typing import Iterable
+from typing import Iterable, Type
 
 class CustomBanner(Frame):
     def __init__(self, master, bg: str) -> None:
@@ -40,3 +40,19 @@ class CustomBanner(Frame):
             return
         
         self._label_middle.config(text=text + f"\n {name} {last_field}")
+
+    def update_scorepoint(self, points: int, team: str) -> None:
+        if not isinstance(points, int):
+            raise TypeError(f"ERROR: cant add point, points must be type 'int' not : {type(points)}")
+        
+        if not isinstance(team, str):
+            raise TypeError(f"ERROR: cant compare team, team must be type 'str' not : {type(team)}")
+
+        if team == "white":
+            self._score_W += points
+            self._label_left.config(text=f"W: {self._score_W}")
+        elif team == "black":
+            self._score_B += points
+            self._label_right.config(text=f"B: {self._score_B}")
+        else:
+            raise ValueError(f"Unknown team {team}")
