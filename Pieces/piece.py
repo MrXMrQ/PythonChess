@@ -31,7 +31,7 @@ class Piece:
             raise ValueError(f"ERROR: chessboard must be type 'dict' not {type(chessboard)}")
 
         valid_moves = []
-        directions = self.directions
+        directions = self._directions
     
         for direction in directions:
             row, col = self.current_field
@@ -60,7 +60,7 @@ class Piece:
 
         return valid_moves
     
-    def apply_move(self, field: tuple, chessboard: dict, banner: CustomBanner) -> None:
+    def apply_move(self, field: tuple, chessboard: dict, banner: CustomBanner) -> dict:
         if field in chessboard:
             if chessboard[field] is not None:
                 banner.update_scorepoint(chessboard[field]._score, self._team)

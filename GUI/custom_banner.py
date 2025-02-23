@@ -8,7 +8,7 @@ class CustomBanner(Frame):
         for i in range(1, 4):
             self.grid_columnconfigure(i, weight=1)
 
-        self._text = "White"
+        self._text = "White beginn`s"
         self._score_W = 0
         self._score_B = 0
 

@@ -122,9 +122,6 @@ class CustomButton(Button):
         CustomButton._move_options.clear()
 
     def _move(self) -> bool:
-        
-
-        # reset buttons that are marked with right click
         for button in CustomButton._marked_buttons:
             button.config(bg=button._bg)
 
@@ -163,11 +160,11 @@ class CustomButton(Button):
                 CustomButton._last_button._content = None
 
                 self._content.moved = True
+
                 Chessboard.chessboard = self._content.apply_move(self._grid, Chessboard.chessboard, self._banner)
 
                 CustomButton._last_button.config(text="")
                 self.config(text=self._content.name)
-
                 self.config(bg=self._bg)
 
                 player = "White" if Chessboard.turn % 2 == 1 else "Black"

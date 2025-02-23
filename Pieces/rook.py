@@ -1,6 +1,4 @@
 from dataclasses import field
-from queue import Empty
-from Pieces import king
 from Pieces.piece import Piece
 from Pieces.king import King
 

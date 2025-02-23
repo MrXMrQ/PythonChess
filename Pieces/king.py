@@ -1,6 +1,11 @@
 from Pieces.limited_range_piece import LimitedRangePiece
+from Pieces.piece import Piece
 
 from typing import override
+
+def get_pawn():
+    from Pieces.pawn import Pawn  # Import erst bei Funktionsaufruf
+    return Pawn
 
 class King(LimitedRangePiece):
     def __init__(self, *args, **kwargs) -> None:
@@ -27,7 +32,40 @@ class King(LimitedRangePiece):
                         valid_moves.append(next_field)
                 else:
                     raise ValueError(f"ERROR: object have no team: {self._team}")
+                
+        other_moves = []
+                
+        for i in chessboard:
+            piece: Piece = chessboard[i]
+            if piece is not None and piece.team != self._team:
+                
+                if isinstance(piece, get_pawn()):
+                    other_moves += piece.diagonal_fields()
+                    continue
+
+                if isinstance(piece, King):
+                    other_moves += self.get_sorunding_fields(chessboard, piece)
+                    continue
+                
+                other_moves += piece.compute_moves(chessboard)  
+
+        other_moves.sort()
+
+        for i in other_moves:
+            if i in valid_moves:
+                valid_moves.remove(i)  
+
         return valid_moves
+    
+    def get_sorunding_fields(self, chessboard: dict, enemy_king: Piece) -> list:
+        x, y = enemy_king._current_field
+        fields = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1), (x - 1, y - 1), (x + 1, y + 1), (x - 1, y + 1), (x + 1, y - 1)]
+
+        for field in fields:
+            if field not in chessboard:
+                fields.remove(field)
+
+        return fields
 
     def check(self) -> None:
         pass

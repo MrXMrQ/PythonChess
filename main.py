@@ -63,7 +63,7 @@ def create_window(cc) -> Tk:
     for i in range(9):
         for j in range(9):
             if i == 8 and j < 8:  # Bottom row (numbers)
-                create_label(board_frame, i, j + 1, text=f"{chr(65 + j)}")
+                create_label(board_frame, i, j + 1, text=f"{j + 1}") #chr(65 + j)
             elif j == 0 and i < 8:  # Left column (numbers)
                 create_label(board_frame, i, j, text=f"{8 - i}")
 

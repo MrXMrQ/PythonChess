@@ -1,8 +1,8 @@
 from tkinter import Tk, Button, Toplevel, Label
 
 from GUI.custom_banner import CustomBanner
-from Pieces.limited_range_piece import LimitedRangePiece
 from Pieces.piece import Piece
+from Pieces.limited_range_piece import LimitedRangePiece
 
 from GUI.custom_button import CustomButton
 
@@ -24,7 +24,7 @@ class Pawn(Piece):
         elif self._team == "black":
             one_step = (row - 1, col)
         else:
-            raise ValueError(f"ERROR: object have no team: {self._team}")
+            raise ValueError(f"ERROR: object have no team: {self._team}") 
 
         if one_step in chessboard and chessboard[one_step] is None:
             valid_moves.append(one_step)
@@ -39,14 +39,7 @@ class Pawn(Piece):
             if not self._moved and two_steps in chessboard and chessboard[two_steps] is None:
                 valid_moves.append(two_steps)
 
-        if self._team == "white":
-            diagonal_left = (row + 1, col - 1)
-            diagonal_right = (row + 1, col + 1)
-        elif self._team == "black":
-            diagonal_left = (row - 1, col - 1)
-            diagonal_right = (row - 1, col + 1)
-        else:
-            raise ValueError(f"ERROR: object have no team: {self._team}")
+        diagonal_left, diagonal_right = self.diagonal_fields()
 
         if diagonal_left in chessboard and chessboard[diagonal_left] is not None:
             if self._team == "white":
@@ -70,18 +63,32 @@ class Pawn(Piece):
         
         return valid_moves
     
+    def diagonal_fields(self) -> tuple[tuple, tuple]:
+        row, col = self._current_field     
+
+        if self._team == "white":
+            diagonal_left = (row + 1, col - 1)
+            diagonal_right = (row + 1, col + 1)
+        elif self._team == "black":
+            diagonal_left = (row - 1, col - 1)
+            diagonal_right = (row - 1, col + 1)
+        else:
+            raise ValueError(f"ERROR: object have no team: {self._team}")
+        
+        return (diagonal_left, diagonal_right)
+
     @override
-    def apply_move(self, field: tuple, chessboard: dict, banner: CustomBanner) -> None:
+    def apply_move(self, field: tuple, chessboard: dict, banner: CustomBanner) -> dict:
         board = super().apply_move(field, chessboard, banner)
 
         if self._current_field[0] == 8:
-            self.open_popup(chessboard, "white")
+            self.open_popup(chessboard, "white", banner)
         elif self._current_field[0] == 1:
-            self.open_popup(chessboard, "black")
+            self.open_popup(chessboard, "black", banner)
 
         return board
     
-    def open_popup(self, chessboard: dict, team: str) -> None:
+    def open_popup(self, chessboard: dict, team: str, banner: CustomBanner) -> None:
         popup = Toplevel(self._window)
         popup.geometry("400x400")
         popup.title("Promotion Selection")
@@ -99,21 +106,22 @@ class Pawn(Piece):
 
         btn_style = {"font": ('Helvetica', 22, 'bold'), "padx": 5, "pady": 5}
 
-        knight = LimitedRangePiece("♘" if team == "white" else "♞", self._current_field, [(2, 1),(2, -1),(-2, 1),(-2, -1),(1, 2),(1, -2), (-1, 2),(-1, -2)], team)
-        rook = Piece("♖" if team == "white" else "♜", self._current_field, [(1, 0), (-1, 0), (0, 1), (0, -1)], team)
-        bishop = Piece("♗" if team == "white" else "♝", self._current_field, [(1, -1), (1, 1), (-1,-1), (-1,1)], team)
-        queen = Piece("♕" if team == "white" else "♛", self._current_field, [(1, 0), (-1, 0), (0, 1), (0, -1), (1, -1), (1, 1), (-1,-1), (-1,1)], team)
+        knight = LimitedRangePiece("♘" if team == "white" else "♞", self._current_field, [(2, 1),(2, -1),(-2, 1),(-2, -1),(1, 2),(1, -2), (-1, 2),(-1, -2)], 3, team)
+        rook = Piece("♖" if team == "white" else "♜", self._current_field, [(1, 0), (-1, 0), (0, 1), (0, -1)], 5, team)
+        bishop = Piece("♗" if team == "white" else "♝", self._current_field, [(1, -1), (1, 1), (-1,-1), (-1,1)], 3, team)
+        queen = Piece("♕" if team == "white" else "♛", self._current_field, [(1, 0), (-1, 0), (0, 1), (0, -1), (1, -1), (1, 1), (-1,-1), (-1,1)], 9, team)
         
-        Button(popup, text="♘" if team == "white" else "♞", command=lambda: [self.replace(knight, chessboard), popup.destroy()], **btn_style).pack(pady=10)
-        Button(popup, text="♖" if team == "white" else "♜", command=lambda: [self.replace(rook, chessboard), popup.destroy()], **btn_style).pack(pady=10)
-        Button(popup, text="♗" if team == "white" else "♝", command=lambda: [self.replace(bishop, chessboard), popup.destroy()], **btn_style).pack(pady=10)
-        Button(popup, text="♕" if team == "white" else "♛", command=lambda: [self.replace(queen, chessboard), popup.destroy()], **btn_style).pack(pady=10)
+        Button(popup, text="♘" if team == "white" else "♞", command=lambda: [self.replace(knight, chessboard, banner), popup.destroy()], **btn_style).pack(pady=10)
+        Button(popup, text="♖" if team == "white" else "♜", command=lambda: [self.replace(rook, chessboard, banner), popup.destroy()], **btn_style).pack(pady=10)
+        Button(popup, text="♗" if team == "white" else "♝", command=lambda: [self.replace(bishop, chessboard, banner), popup.destroy()], **btn_style).pack(pady=10)
+        Button(popup, text="♕" if team == "white" else "♛", command=lambda: [self.replace(queen, chessboard, banner), popup.destroy()], **btn_style).pack(pady=10)
 
         self._window.wait_window(popup) 
 
-    def replace(self, piece: Piece, chessboard: dict) -> None:
+    def replace(self, piece: Piece, chessboard: dict, banner: CustomBanner) -> None:
         chessboard[self._current_field] = piece
         CustomButton._button_registry[self.current_field]._content = piece
+        banner.change_text(self._team[0].upper() + self._team[1:] + f" PROMOTES {self._name} to {chessboard[self._current_field]._name}", None)
         
     @property
     def window(self) -> Tk:
