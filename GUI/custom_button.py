@@ -12,6 +12,9 @@ class CustomButton(Button):
     _marked_buttons: list= []
     _move_options: list = []
     _last_button = None
+    _is_check: bool = False
+    _check_buttons = []
+    _check_pos = None
 
     def __init__(self, content: Piece, chessboard_console: Chessboard, banner: CustomBanner, root, grid) -> None:
         self._content = content
@@ -42,9 +45,6 @@ class CustomButton(Button):
             self._unmark_button()
         else:
             self._mark_button()
-        
-        CustomButton._marked_buttons.append(self)
-        self.config(bg="Green")
 
     def _mark_button(self) -> None:
         CustomButton._marked_buttons.append(self)
@@ -58,6 +58,13 @@ class CustomButton(Button):
         if self._move():
             print(f"\n{self._chessboard_console}")
             self._reset_highlight()
+            self._check(Chessboard.chessboard)
+            return
+
+        print(CustomButton._is_check)
+        if CustomButton._is_check:
+            if self in CustomButton._check_buttons:
+                self._handle_selection()
             return
         
         if self._track_turn():
@@ -130,9 +137,18 @@ class CustomButton(Button):
         CustomButton._marked_buttons.clear()
 
         for button in CustomButton._move_options:
+            #if CustomButton._is_check:
+                #return self._execute_check_move()
+
             if self == button:
                 return self._execute_move()
         
+        return False
+    
+    def _execute_check_move(self) -> bool:
+        print(CustomButton._last_button._content)
+        if self._grid == CustomButton._check_pos:
+            pass
         return False
             
     def _execute_move(self) -> bool:
@@ -163,8 +179,28 @@ class CustomButton(Button):
         self._banner.change_text(f"{player} CASTLE", None)
         return True
 
-    def _update_castling_buttons(self, rook_pos, king_pos):
+    def _update_castling_buttons(self, rook_pos, king_pos) -> None:
         for pos in [rook_pos, king_pos]:
             button = CustomButton._button_registry[pos]
             button._content = Chessboard.chessboard[pos]
             button.config(text=button._content.name)
+
+    def _check(self, chessboard: dict) -> bool:
+        for piece in chessboard.values():
+            if isinstance(piece, King) and piece.team != self._content.team:
+                king: King = piece
+                break
+
+        if king.current_field in self._content.compute_moves(chessboard):
+            CustomButton._button_registry[king.current_field].config(bg="Red")
+            CustomButton._is_check = True
+            CustomButton._check_buttons = self.temp_name(chessboard)
+            return
+        
+        CustomButton._is_check = False
+    
+    def temp_name(self, chessboard) -> list:
+        attacker_pos = self._content.current_field
+        buttons_team = [button for button in CustomButton._button_registry.values() if button._content and button._content.team != self._content.team and attacker_pos in button._content.compute_moves(chessboard)]
+        CustomButton._check_pos = attacker_pos
+        return buttons_team
