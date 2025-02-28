@@ -1,6 +1,6 @@
 from tkinter import Frame, Tk, Label
 
-from Pieces.limited_range_piece import LimitedRangePiece
+from Pieces.knight import LimitedRangePiece
 from Pieces.piece import Piece
 from Pieces.pawn import Pawn
 from Pieces.king import King

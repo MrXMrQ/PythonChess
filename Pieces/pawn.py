@@ -1,6 +1,6 @@
 from tkinter import Tk, Button, Toplevel, Label
 
-from Pieces.limited_range_piece import LimitedRangePiece
+from Pieces.knight import LimitedRangePiece
 from GUI.custom_banner import CustomBanner
 from Pieces.piece import Piece
 
