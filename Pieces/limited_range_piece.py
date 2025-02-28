@@ -2,31 +2,39 @@ from Pieces.piece import Piece
 
 from typing import override
 
-
-
 class LimitedRangePiece(Piece):
+    """
+    Represents a chess piece with a limited movement range.
+    
+    This class extends the `Piece` class and allows movement only 
+    within predefined directional limits.
+    """
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
     @override
     def compute_moves(self, chessboard) -> list:
+        """
+        Computes all valid moves for the knight piece.
+
+        Args:
+            chessboard (dict): The current chessboard state.
+
+        Returns:
+            list: A list of valid move positions as (row, col) tuples.
+        """
+
         valid_moves = []
-        directions = self.directions
-        
         row, col = self.current_field
 
-        for direction in directions:
-            new_row = row + direction[0]
-            new_col = col + direction[1]
-            next_field = (new_row, new_col)
+        for drY, drX in self._directions:
+            next_field = (row + drY, col + drX)
 
             if next_field in chessboard:
-                if self._team == "white":
-                    if chessboard[next_field] is None or not chessboard[next_field]._team == "white":
-                        valid_moves.append(next_field)
-                elif self._team == "black":
-                    if chessboard[next_field] is None or not chessboard[next_field]._team == "black":
-                        valid_moves.append(next_field)
-                else:
-                    raise ValueError(f"ERROR: object have no team: {self._team}")
+                piece_at_target = chessboard[next_field]
+
+                if piece_at_target is None or piece_at_target._team != self._team:
+                    valid_moves.append(next_field)
+                    
         return valid_moves
