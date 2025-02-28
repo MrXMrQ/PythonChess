@@ -58,8 +58,13 @@ class King(Piece):
                 if append_protected_field and piece_at_field and piece_at_field._team == self._team:
                     Piece.protected_fields.append(next_field)
         
+        threatened_moves = self.get_threatened_moves(chessboard)
+
+        return [move for move in valid_moves if move not in threatened_moves]
+    
+    def get_threatened_moves(self, chessboard: dict) -> list:
         threatened_moves = []
-                
+
         for position, piece_at_field in chessboard.items():
             if piece_at_field and piece_at_field.team != self._team:
                 if isinstance(piece_at_field, get_pawn()):
@@ -69,8 +74,8 @@ class King(Piece):
                 else:
                     threatened_moves += piece_at_field.compute_moves(chessboard)
 
-        return [move for move in valid_moves if move not in threatened_moves]
-    
+        return threatened_moves
+
     def _get_surrounding_fields(self, chessboard: dict, enemy_king: Piece) -> list:
         """
         Returns all surrounding fields of the given enemy king that are on the chessboard.

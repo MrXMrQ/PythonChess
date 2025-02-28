@@ -5,6 +5,10 @@ from GUI.custom_banner import CustomBanner
 
 from typing import override
 
+def get_button():
+    from GUI.custom_button import CustomButton
+    return CustomButton
+
 class Rook(Piece):
     """
     Represents a rook in a chess game, including its movement and castling behavior.
@@ -52,15 +56,7 @@ class Rook(Piece):
             self._moved = True,
             chessboard[king_position]._moved = True
 
-            rook_y, rook_x = self._current_field
-            king_y, king_x = king_position
-
-            if rook_x > king_x:  # Queenside castling (long castling)
-                new_rook_position = (king_y, king_x + 1)
-                new_king_position = (rook_y, rook_x - 1)
-            else:  # Kingside castling (short castling)
-                new_rook_position = (king_y, king_x - 1)
-                new_king_position = (rook_y, rook_x + 2)
+            new_king_position, new_rook_position, rook_y, rook_x, king_x = self._calculate_positions(king_position)
 
             chessboard[new_rook_position], chessboard[new_king_position] = chessboard[self._current_field], chessboard[king_position]
             self._current_field = new_rook_position
@@ -77,6 +73,19 @@ class Rook(Piece):
         
         return super().apply_move(chessboard, king_position, banner)
     
+    def _calculate_positions(self, king_position: tuple[int, int]) -> tuple[tuple[int, int], tuple[int, int], int, int, int]:
+        rook_y, rook_x = self._current_field
+        king_y, king_x = king_position
+        
+        if rook_x > king_x:  # Queenside castling (long castling)
+            new_rook_position = (king_y, king_x + 1)
+            new_king_position = (rook_y, rook_x - 1)
+        else:  # Kingside castling (short castling)
+            new_rook_position = (king_y, king_x - 1)
+            new_king_position = (rook_y, rook_x + 2)
+
+        return new_king_position, new_rook_position, rook_y, rook_x, king_x
+
     def castle(self, chessboard: dict) -> tuple:
         """
         Determines if castling is possible and returns the king's position if valid.
@@ -92,12 +101,18 @@ class Rook(Piece):
         Returns:
             tuple | None: The king's position if castling is possible, otherwise None.
         """
-        
+
+        if get_button()._is_check:
+            return None
+
         specific_fields = self._field_between_rook_and_king(chessboard)
     
         if specific_fields and self._all_keys_None(specific_fields, chessboard):
             for position, piece in chessboard.items():
                 if isinstance(piece, King) and piece._team == self._team and not (self._moved or piece._moved):
+                    new_king_pos, *rest = self._calculate_positions(piece.current_field)
+                    if new_king_pos in piece.get_threatened_moves(chessboard):
+                        return None
                     return piece._current_field
 
         return None
