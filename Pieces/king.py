@@ -31,7 +31,7 @@ class King(Piece):
         super().__init__(*args, **kwargs)
 
     @override
-    def compute_moves(self, chessboard) -> list:
+    def compute_moves(self, chessboard, append_protected_field = False) -> list:
         """
         Computes all valid moves for the king piece while considering other pieces potential threats.
 
@@ -45,24 +45,29 @@ class King(Piece):
         valid_moves = [] 
         row, col = self.current_field
 
+        print(f"Protected field: {Piece.protected_fields}")
+
         for drY, drX in self._directions:
             next_field = (row + drY, col + drX)
 
             if next_field in chessboard:
-                piece = chessboard[next_field]
-                if piece is None or piece.team != self._team:
+                piece_at_field = chessboard[next_field]
+                if piece_at_field is None or piece_at_field.team != self._team and next_field not in Piece.protected_fields:
                     valid_moves.append(next_field)    
-   
+                
+                if append_protected_field and piece_at_field and piece_at_field._team == self._team:
+                    Piece.protected_fields.append(next_field)
+        
         threatened_moves = []
                 
-        for position, piece in chessboard.items():
-            if piece and piece.team != self._team:
-                if isinstance(piece, get_pawn()):
-                    threatened_moves += piece._diagonal_fields()
-                elif isinstance(piece, King):
-                    threatened_moves += self._get_surrounding_fields(chessboard, piece)   
+        for position, piece_at_field in chessboard.items():
+            if piece_at_field and piece_at_field.team != self._team:
+                if isinstance(piece_at_field, get_pawn()):
+                    threatened_moves += piece_at_field._diagonal_fields()
+                elif isinstance(piece_at_field, King):
+                    threatened_moves += self._get_surrounding_fields(chessboard, piece_at_field)   
                 else:
-                    threatened_moves += piece.compute_moves(chessboard)
+                    threatened_moves += piece_at_field.compute_moves(chessboard)
 
         return [move for move in valid_moves if move not in threatened_moves]
     

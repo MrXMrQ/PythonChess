@@ -1,6 +1,6 @@
 from tkinter import Tk, Button, Toplevel, Label
 
-from Pieces.knight import LimitedRangePiece
+from Pieces.knight import Knight
 from GUI.custom_banner import CustomBanner
 from Pieces.piece import Piece
 
@@ -42,7 +42,7 @@ class Pawn(Piece):
         super().__init__(*args, **kwargs)
 
     @override
-    def compute_moves(self, chessboard: dict) -> list:
+    def compute_moves(self, chessboard: dict, append_protected_fields = False) -> list:
         """
         Computes all valid moves for the pawn piece based on the current chessboard state.
             - two steps or one step on start
@@ -59,7 +59,7 @@ class Pawn(Piece):
         """
 
         valid_moves = []
-        row, col = self.current_field
+        row, col = self._current_field
         direction = 1 if self._team == "white" else - 1
 
         one_step = (row + direction, col)
@@ -73,9 +73,12 @@ class Pawn(Piece):
 
         for diagonal in self._diagonal_fields():
             if diagonal in chessboard and chessboard[diagonal] is not None:
-                if chessboard[diagonal]._team != self._team:
-                    valid_moves.append(diagonal)   
+                if chessboard[diagonal].team != self._team:
+                    valid_moves.append(diagonal) 
 
+                if append_protected_fields and chessboard[diagonal] and chessboard[diagonal].team == self._team:
+                    Piece.protected_fields.append(diagonal)  
+        
         return valid_moves
     
     def _diagonal_fields(self) -> list[tuple, tuple]:
@@ -100,9 +103,15 @@ class Pawn(Piece):
 
         board = super().apply_move(chessboard, field, banner)
 
+        Piece.protected_fields.clear()
+
         if self._current_field[0] in {1, 8}:
             team_color = "white" if self._current_field[0] == 8 else "black"
             self._open_popup(chessboard, team_color, banner)
+
+        for position, piece in chessboard.items():
+            if piece and self._team == piece.team:
+                piece.compute_moves(chessboard, True)
 
         return board
     
@@ -135,7 +144,7 @@ class Pawn(Piece):
 
         btn_style = {"font": ('Helvetica', 22, 'bold'), "padx": 5, "pady": 5}
 
-        knight = LimitedRangePiece("♘" if team == "white" else "♞", self._current_field, [(2, 1),(2, -1),(-2, 1),(-2, -1),(1, 2),(1, -2), (-1, 2),(-1, -2)], 3, team)
+        knight = Knight("♘" if team == "white" else "♞", self._current_field, [(2, 1),(2, -1),(-2, 1),(-2, -1),(1, 2),(1, -2), (-1, 2),(-1, -2)], 3, team)
         rook = Piece("♖" if team == "white" else "♜", self._current_field, [(1, 0), (-1, 0), (0, 1), (0, -1)], 5, team)
         bishop = Piece("♗" if team == "white" else "♝", self._current_field, [(1, -1), (1, 1), (-1,-1), (-1,1)], 3, team)
         queen = Piece("♕" if team == "white" else "♛", self._current_field, [(1, 0), (-1, 0), (0, 1), (0, -1), (1, -1), (1, 1), (-1,-1), (-1,1)], 9, team)

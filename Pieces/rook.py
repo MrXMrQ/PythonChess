@@ -46,6 +46,8 @@ class Rook(Piece):
         """
         
         if isinstance (chessboard[king_position], King) and self._can_castle:
+            Piece.protected_fields.clear()
+
             self._can_castle = False
             self._moved = True,
             chessboard[king_position]._moved = True
@@ -66,6 +68,10 @@ class Rook(Piece):
 
             chessboard[(rook_y, 8 if king_x < rook_x else 1)] = None
             chessboard[(rook_y, 5)] = None
+
+            for position, piece in chessboard.items():
+                if piece and self._team == piece.team:
+                    piece.compute_moves(chessboard, True)
 
             return [chessboard, new_king_position, new_rook_position]
         

@@ -2,7 +2,7 @@ from Pieces.piece import Piece
 
 from typing import override
 
-class LimitedRangePiece(Piece):
+class Knight(Piece):
     """
     Represents a chess piece with a limited movement range.
     
@@ -14,7 +14,7 @@ class LimitedRangePiece(Piece):
         super().__init__(*args, **kwargs)
 
     @override
-    def compute_moves(self, chessboard) -> list:
+    def compute_moves(self, chessboard, append_protected_field = False) -> list:
         """
         Computes all valid moves for the knight piece.
 
@@ -32,9 +32,12 @@ class LimitedRangePiece(Piece):
             next_field = (row + drY, col + drX)
 
             if next_field in chessboard:
-                piece_at_target = chessboard[next_field]
+                piece_at_field = chessboard[next_field]
 
-                if piece_at_target is None or piece_at_target._team != self._team:
+                if piece_at_field is None or piece_at_field._team != self._team:
                     valid_moves.append(next_field)
+
+                if append_protected_field and piece_at_field and piece_at_field._team == self._team:
+                    Piece.protected_fields.append(next_field)
                     
         return valid_moves
